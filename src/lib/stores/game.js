@@ -33,6 +33,13 @@ const storeData = writable({
 export const store = {
   ...storeData,
 
+  restore({players, ...settings}) {
+    storeData.update(state => ({
+      ...settings,
+      players: players.map(player => ({...player}))
+    }))
+  },
+
   reset() {
     const players = get(storeData).players;
 

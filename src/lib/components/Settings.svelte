@@ -1,9 +1,11 @@
 <script>
   import {get} from "svelte/store";
   import {game, app} from "$lib/store.js";
+	import { onMount } from "svelte";
 
 let amount = get(game).playerCount;
 let lifeTotal = get(game).lifeTotal;
+let hasNoSettings = true;
 
 $: (
   game.setPlayers(amount)
@@ -22,6 +24,31 @@ function onSettingsFileChange(e) {
 function onReset() {
   game.reset();
 }
+
+function saveSettings() {
+  const gameSettings = get(game);
+
+  localStorage.setItem('settings', JSON.stringify(gameSettings));
+}
+
+function restoreSettings() {
+  const settings = localStorage.getItem('settings');
+
+  if (!settings){
+    return;
+  }
+
+  try {
+    game.restore(JSON.parse(settings));
+  } catch (e) {
+    localStorage.removeItem("settings");
+  }
+}
+
+onMount(() => {
+  const previousSettings = localStorage.getItem('settings');
+  hasNoSettings = !previousSettings;
+});
 </script>
 
 <div>
@@ -45,7 +72,35 @@ function onReset() {
 
 
   <div class="group">
+    <span class="group-title">Gameplay</span>
+
+    <label class="label">
+      <span class="label-title">Reset totals</span>
+      <span class="label-input">
+        <button on:click={onReset}>Do it</button>
+      </span>
+    </label>
+  </div>
+
+
+
+
+  <div class="group">
     <span class="group-title">App</span>
+
+    <label class="label">
+      <span class="label-title">Save settings</span>
+      <span class="label-input">
+        <button on:click={saveSettings}>Save</button>
+      </span>
+    </label>
+
+    <label class="label">
+      <span class="label-title">Restore settings</span>
+      <span class="label-input">
+        <button disabled={hasNoSettings} on:click={restoreSettings}>Restore</button>
+      </span>
+    </label>
 
     <label class="label">
       <span class="label-title">Settings image</span>
@@ -56,18 +111,6 @@ function onReset() {
         {#if $app.image}
           <img src={$app.image} alt=""/>
         {/if}
-      </span>
-    </label>
-  </div>
-
-
-  <div class="group">
-    <span class="group-title">Gameplay</span>
-
-    <label class="label">
-      <span class="label-title">Reset totals</span>
-      <span class="label-input">
-        <button on:click={onReset}>Do it</button>
       </span>
     </label>
   </div>
