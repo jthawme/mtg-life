@@ -1,0 +1,72 @@
+/* Write your global styles here, in SCSS syntax. Variables and mixins from the src/variables.scss file are available here without importing */
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  font-family: sans-serif;
+
+  background-color: #111;
+}
+
+img {
+  max-width: 100%;
+}
+
+
+.group {
+  margin: 1em 0;
+}
+
+.group-title {
+  display: block;
+
+  font-weight: bold;
+
+  border-bottom: 1px solid currentColor;
+
+  padding-bottom: 0.4em;
+  margin-bottom: 1em;
+}
+
+.label {
+  display: grid;
+  margin: 1em 0;
+
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  grid-template-areas: "title input";
+
+  font-size: 1.5rem;
+
+  &-title,
+  &-input {
+    display: block;
+
+    min-width: 0;
+  }
+
+  &-title {
+    grid-area: title;
+  }
+
+  &-input {
+    position: relative;
+
+    grid-area: input;
+
+    justify-self: flex-end;
+    text-align: right;
+  }
+
+  input[type='file'] {
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+  }
+}
