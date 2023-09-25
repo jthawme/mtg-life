@@ -9,7 +9,7 @@ const defaultStoreData = {
   lifeTotal: 40
 };
 
-const colors = ['red', 'blue', 'green', 'yellow'];
+const colors = ['#ff0000', '#0000ff', '#00ff00', '#ffff00'];
 
 const createFakePlayer = ({lifeTotal = defaultStoreData.lifeTotal, index = 0} = {}) => {
   return {

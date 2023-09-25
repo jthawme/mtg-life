@@ -45,6 +45,14 @@ function restoreSettings() {
   }
 }
 
+function onFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
+
 onMount(() => {
   const previousSettings = localStorage.getItem('settings');
   hasNoSettings = !previousSettings;
@@ -99,6 +107,13 @@ onMount(() => {
       <span class="label-title">Restore settings</span>
       <span class="label-input">
         <button disabled={hasNoSettings} on:click={restoreSettings}>Restore</button>
+      </span>
+    </label>
+
+    <label class="label">
+      <span class="label-title">Fullscreen</span>
+      <span class="label-input">
+        <button on:click={onFullscreen}>Toggle</button>
       </span>
     </label>
 
