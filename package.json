@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "npm run generate-pwa-assets && vite build",
+    "preview": "vite preview",
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal static/favicon.svg"
   },
   "devDependencies": {
     "@iconify/icons-ion": "^1.2.10",
@@ -13,6 +14,7 @@
     "@sveltejs/adapter-auto": "^2.0.0",
     "@sveltejs/adapter-netlify": "^2.0.8",
     "@sveltejs/kit": "^1.20.4",
+    "@vite-pwa/assets-generator": "^0.0.10",
     "prettier-plugin-svelte": "^3.0.3",
     "sass": "^1.68.0",
     "svelte": "^4.0.5",
@@ -25,6 +27,7 @@
   "dependencies": {
     "@vite-pwa/sveltekit": "^0.2.7",
     "normalize.css": "^8.0.1",
+    "sharp": "^0.32.6",
     "short-unique-id": "^5.0.3"
   }
 }
