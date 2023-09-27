@@ -14,6 +14,11 @@ function onSettingsFileChange(e) {
   app.setImage(URL.createObjectURL(file));
 }
 
+function onClearImage() {
+  console.log('hey');
+  app.setImage(null);
+}
+
 function onReset() {
   game.reset();
 }
@@ -175,6 +180,16 @@ $: settings = [
       type: "image",
       change: onSettingsFileChange,
       value: $app.image
+    },
+    {
+      title: "Clear image",
+      name: "clearImage",
+      type: "button",
+      click: onClearImage,
+      text: "Clear",
+      options: {
+        disabled: !$app.image
+      }
     },
     {
       title: "Colour Palette",
