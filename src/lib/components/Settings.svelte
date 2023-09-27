@@ -2,18 +2,11 @@
   import {get} from "svelte/store";
   import {game, app} from "$lib/store.js";
 	import { onMount } from "svelte";
+	import SettingsSchema from "./SettingsSchema.svelte";
 
 let amount = get(game).playerCount;
 let lifeTotal = get(game).lifeTotal;
 let hasNoSettings = true;
-
-$: (
-  game.setPlayers(amount)
-);
-
-$: (
-  game.setKey("lifeTotal", lifeTotal)
-)
 
 function onSettingsFileChange(e) {
   const [file] = e.target.files;
@@ -26,9 +19,13 @@ function onReset() {
 }
 
 function saveSettings() {
+  const appSettings = get(app);
   const gameSettings = get(game);
 
-  localStorage.setItem('settings', JSON.stringify(gameSettings));
+  localStorage.setItem('settings', JSON.stringify({
+    app: appSettings,
+    game: gameSettings
+  }));
 }
 
 function restoreSettings() {
@@ -39,7 +36,14 @@ function restoreSettings() {
   }
 
   try {
-    game.restore(JSON.parse(settings));
+    const {game: gameSettings, app: appSettings} = JSON.parse(settings)
+    app.restore(appSettings);
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        game.restore(gameSettings);
+      })
+    })
   } catch (e) {
     localStorage.removeItem("settings");
   }
@@ -53,84 +57,150 @@ function onFullscreen() {
   }
 }
 
+function toggleTracking(type) {
+  game.toggleTracking(type);
+}
+
 onMount(() => {
   const previousSettings = localStorage.getItem('settings');
   hasNoSettings = !previousSettings;
 });
+
+function onInput(e) {
+  const name = e.target.name;
+
+  switch (name) {
+    case "players":
+      game.setPlayers(parseInt(e.target.value));
+      break;
+    case "lifeTotal":
+      game.setKey("lifeTotal", parseInt(e.target.value));
+      break;
+    case "fontSize":
+      app.setFontSize(parseInt(e.target.value));
+      break;
+  }
+}
+
+function onPaletteChange(e) {
+  app.setColorPalette(e.target.value);
+}
+
+$: settings = [
+  {
+    title: "Settings",
+    inputs: [
+      {
+        title: "Players",
+        name: "players",
+        type: "number",
+        value: amount,
+        input: onInput,
+        options: {
+          min: 2,
+          max: 4,
+        }
+      },
+      {
+        title: "Life Total",
+        name: "lifeTotal",
+        type: "number",
+        value: lifeTotal,
+        input: onInput,
+        options: {
+          min: 1,
+          max: 100,
+        }
+      }
+    ]
+  },
+
+{
+  title: "Gameplay",
+  inputs: [
+    {
+      title: "Reset Totals",
+      name: "totals",
+      type: "button",
+      click: onReset,
+      text: "Reset"
+    },
+    {
+      title: "Track Poison",
+      name: "poison",
+      type: "checkbox",
+      value: $game.tracking.poison,
+      change: () => toggleTracking('poison')
+    },
+    {
+      title: "Track Commander Damage",
+      name: "commander",
+      type: "checkbox",
+      value: $game.tracking.commander,
+      change: () => toggleTracking('commander')
+    }
+  ]
+},
+
+{
+  title: "App",
+  inputs: [
+    {
+      title: "Save settings",
+      name: "save",
+      type: "button",
+      click: saveSettings,
+      text: "Save"
+    },
+    {
+      title: "Restore settings",
+      name: "restore",
+      type: "button",
+      click: restoreSettings,
+      text: "Restore",
+      options: {
+        disabled: hasNoSettings
+      }
+    },
+    {
+      title: "Fullscreen",
+      name: "fullscreen",
+      type: "button",
+      click: onFullscreen,
+      text: "Toggle"
+    },
+    {
+      title: "Settings image",
+      name: "image",
+      type: "image",
+      change: onSettingsFileChange,
+      value: $app.image
+    },
+    {
+      title: "Colour Palette",
+      name: "palette",
+      type: "select",
+      change: onPaletteChange,
+      value: $app.colorPalette,
+      options: [...$app.palettes].map((option) => ({
+        value: option,
+        label: option
+      }))
+    },
+      {
+        title: "Font Size",
+        name: "fontSize",
+        type: "number",
+        value: $app.fontSize,
+        input: onInput,
+        options: {
+          min: 1,
+          max: 20,
+        }
+      },
+  ]
+}
+]
 </script>
 
-<div>
-  <div class="group">
-    <span class="group-title">Settings</span>
-
-    <label class="label">
-      <span class="label-title">Players</span>
-      <span class="label-input">
-        <input type="number" bind:value={amount} min="2" max="4"/>
-      </span>
-    </label>
-
-    <label class="label">
-      <span class="label-title">Life total</span>
-      <span class="label-input">
-        <input type="number" bind:value={lifeTotal} min="1" max="100"/>
-      </span>
-    </label>
-  </div>
-
-
-  <div class="group">
-    <span class="group-title">Gameplay</span>
-
-    <label class="label">
-      <span class="label-title">Reset totals</span>
-      <span class="label-input">
-        <button on:click={onReset}>Do it</button>
-      </span>
-    </label>
-  </div>
-
-
-
-
-  <div class="group">
-    <span class="group-title">App</span>
-
-    <label class="label">
-      <span class="label-title">Save settings</span>
-      <span class="label-input">
-        <button on:click={saveSettings}>Save</button>
-      </span>
-    </label>
-
-    <label class="label">
-      <span class="label-title">Restore settings</span>
-      <span class="label-input">
-        <button disabled={hasNoSettings} on:click={restoreSettings}>Restore</button>
-      </span>
-    </label>
-
-    <label class="label">
-      <span class="label-title">Fullscreen</span>
-      <span class="label-input">
-        <button on:click={onFullscreen}>Toggle</button>
-      </span>
-    </label>
-
-    <label class="label">
-      <span class="label-title">Settings image</span>
-      <span class="label-input">
-        <input type="file" accept="image/*" on:change={onSettingsFileChange}/>
-        <span>Select</span>
-
-        {#if $app.image}
-          <img src={$app.image} alt=""/>
-        {/if}
-      </span>
-    </label>
-  </div>
-</div>
-
-<style lang="scss">
-
-</style>
+<SettingsSchema settings={settings}/>

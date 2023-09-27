@@ -18,6 +18,8 @@ function onPlayerUpdate({detail}) {
     case 'change':
       if (key.startsWith("settings.")) {
         game.setPlayerSettings(id, key.split("settings.").join(""), value)
+      } else if (key.startsWith("values.")) {
+        game.setPlayerTrackedValue(id, key.split("values.").join(""), value)
       } else {
         game.setPlayerValue(id, key, value)
       }
@@ -40,7 +42,7 @@ function onSettings() {
 
 <div class="tile-wrapper" class:row={$game.players.length <= 2}>
   {#each $game.players as player (player.id) }
-      <PlayerTile {...player} on:update={onPlayerUpdate}/>
+      <PlayerTile {...player} withCommanderDamage={$game.tracking.commander} withPoison={$game.tracking.poison} on:update={onPlayerUpdate}/>
   {/each}
 
   <button class="settings-btn" on:click={onSettings} class:hasImage={!!$app.image}>

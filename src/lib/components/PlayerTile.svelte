@@ -3,19 +3,31 @@
 	import { onMount, createEventDispatcher } from 'svelte';
   import {listenCb, onWindowResize} from "$lib/utils.js";
 	import Modal from './Modal.svelte';
+	import PlayerSettings from './PlayerSettings.svelte';
+	import InlineTracker from './InlineTracker.svelte';
   
 	const dispatch = createEventDispatcher();
 
   export let id;
   export let settings;
   export let life = 0;
+  export let values = {};
+
+  export let withPoison = false;
+  export let withCommanderDamage = false;
 
   export let debounceTime = 1000;
 
+  $: hasAdditionalTrackers = !!withPoison || !!withCommanderDamage;
+
   let settingsModal = false;
+
+  $: poison = values.poison ?? 0;
+  $: commander = values.commander ?? 0;
 
   $: color = settings?.color ?? 'silver';
   $: rotation = (settings?.flipped ?? 0);
+  $: counterbalance = rotation % 2 === 1;
 
   let el = null;
 
@@ -47,15 +59,6 @@
     }, debounceTime);
   }
 
-  function onRotate() {
-    dispatch('update', {
-      id,
-      action: 'change',
-      key: 'settings.flipped',
-      value: ((settings?.flipped ?? 0) + 1) % 4
-    })
-  }
-
   $: difference = displayedLife - life;
 
   function onMouseMove(e) {
@@ -70,12 +73,16 @@
     elY = y;
   }
 
-  function onChangeColor(e) {
+  function onUpdate({detail}) {
+    dispatch("update", detail);
+  }
+
+  function changeTrackedAmount(type, value) {
     dispatch('update', {
       id,
       action: 'change',
-      key: 'settings.color',
-      value: e.target.value
+      key: `values.${type}`,
+      value
     })
   }
 
@@ -92,37 +99,18 @@
 
   $: style = Object.entries({
     '--color': color,
+    '--text-color': settings.textColor,
     '--x': mouseX - elX,
     '--y': mouseY - elY,
-    '--rotation': rotation * 90
+    '--rotation': rotation * 90,
   }).map(tuples => tuples.join(": ")).join("; ")
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div bind:this={el} on:mousemove={onMouseMove} class="tile" style={style}>
+<div bind:this={el} on:mousemove={onMouseMove} class="tile" class:counterbalance style={style}>
   {#if settingsModal}
     <Modal on:close={() => settingsModal = false}>
-      <div class="group">
-        <span class="group-title">Player</span>
-
-        <label class="label">
-          <div class="label-title">
-            Flipped
-          </div>
-          <div class="label-input">
-            <button on:click={onRotate}>Flip</button>
-          </div>
-        </label>
-
-        <label class="label">
-          <div class="label-title">
-            Color
-          </div>
-          <div class="label-input">
-            <input value={color} type="color" on:change={onChangeColor}/>
-          </div>
-        </label>
-      </div>
+      <PlayerSettings {...settings} id={id} on:update={onUpdate}/>
     </Modal>
   {/if}
 
@@ -136,10 +124,23 @@
   </div>
   {/if}
 
-  <div class="tile-hit-area">
-    <button tabindex="-1" on:click={() => changeLife(1)} class="tile-hit-area-el tile-hit-area-el--top"/>
-    <button tabindex="-1" on:click={() => changeLife(-1)} class="tile-hit-area-el tile-hit-area-el--bottom"/>
-    <span class="tile-hit-area-display">{displayedLife}</span>
+  <div class="rotation-plane">
+    <div class="tile-hit-area">
+      <button tabindex="-1" on:click={() => changeLife(1)} class="tile-hit-area-el tile-hit-area-el--top"/>
+      <button tabindex="-1" on:click={() => changeLife(-1)} class="tile-hit-area-el tile-hit-area-el--bottom"/>
+      <span class="tile-hit-area-display">{displayedLife}</span>
+    </div>
+
+    {#if hasAdditionalTrackers}
+      <div class="tracker-tray">
+        {#if withPoison}
+          <InlineTracker class="tracker--poison" label="Poison" value={poison} on:change={({detail}) => changeTrackedAmount('poison', detail)}/>
+        {/if}
+        {#if withCommanderDamage}
+          <InlineTracker class="tracker--commander" label="Commander" value={commander} on:change={({detail}) => changeTrackedAmount('commander', detail)}/>
+        {/if}
+      </div>
+    {/if}
   </div>
 </div>
 
@@ -156,6 +157,8 @@
     background-color: var(--color);
 
     overflow: hidden;
+
+    container-type: size;
   }
 
   .hover {
@@ -211,9 +214,8 @@
 
     grid-template-rows: repeat(2, 1fr);
 
-    transform: rotate(calc(var(--rotation) * 1deg));
-
     flex-grow: 1;
+    color: var(--text-color, inherit);
 
     &-display {
       position: absolute;
@@ -224,7 +226,7 @@
 
       transform: translate3d(-50%, -50%, 0);
 
-      font-size: 10vw;
+      font-size: calc(var(--global-font-size, 10) * 1vw);
       font-weight: bold;
     }
 
@@ -260,11 +262,6 @@
   .settings-btn {
     position: absolute;
 
-    bottom: 10px;
-    left: 50%;
-
-    transform: translate3d(-50%, 0, 0);
-
     z-index: 10;
 
     line-height: 0;
@@ -272,7 +269,7 @@
     background-color: transparent;
     border: none;
 
-    padding: 0;
+    padding: 10px;
     margin: 0;
 
     opacity: 0.25;
@@ -280,5 +277,80 @@
     :global(svg) {
       width: 24px;
     }
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.5;
+      cursor: pointer;
+    }
+
+    .tile:nth-child(4n + 1) & {
+      top: 0;
+      left: 0;
+    }
+
+    .tile:nth-child(4n + 2) & {
+      top: 0;
+      right: 0;
+    }
+
+    .tile:nth-child(4n + 3) & {
+      bottom: 0;
+      left: 0;
+    }
+
+    .tile:nth-child(4n) & {
+      bottom: 0;
+      right: 0;
+    }
+  }
+
+  .rotation-plane {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    flex-grow: 1;
+
+    transform: translate3d(-50%, -50%, 0) rotate(calc(var(--rotation) * 1deg));
+
+    width: 100cqw;
+    height: 100cqh;
+
+    .counterbalance & {
+      height: 100cqw;
+      width: 100cqh;
+    }
+  }
+
+  .tracker-tray {
+    margin: 10px;
+
+    padding: 10px;
+
+    background-color: rgba(0,0,0,0.15);
+
+    border-radius: 10px;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: 100px;
+    grid-auto-columns: 100px;
+    gap: 10px;
+
+    justify-content: center;
+  }
+
+  :global(.tracker--poison) {
+    --tracker-bg: #337430;
+  }
+
+  :global(.tracker--commander) {
+    --tracker-bg: #C04329;
   }
 </style>

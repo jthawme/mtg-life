@@ -406,3 +406,11 @@ export const slugify = (str) => {
 
 	return str;
 };
+
+export const randomFrom = arr => {
+	return arr[Math.floor(arr.length * Math.random())];
+}
+
+export const getNth = (arr, idx, total) => {
+	return arr[idx % (total || arr.length)];
+}

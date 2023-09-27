@@ -86,9 +86,7 @@
   height: 100%;
   max-width: var(--inner-max-width, 560px);
 
-  background-color: #222;
-
-  color: white;
+  background-color: var(--bg, #222);
 
   padding: 20px;
 
