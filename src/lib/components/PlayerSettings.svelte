@@ -7,6 +7,8 @@
   export let color;
   export let textColor;
   export let id;
+  export let name;
+  export let life = 40;
 
   function onRotate() {
     dispatch('update', {
@@ -37,7 +39,28 @@
     })
   }
 
+  function onNameUpdate(e) {
+    dispatch('update', {
+      id,
+      action: 'change',
+      key: 'name',
+      value: e.target.value
+    })
+  }
+
   $: settings = [
+    {
+      title: "Player",
+      inputs: [
+        {
+          title: "Name",
+          name: "name",
+          type: "text",
+          input: onNameUpdate,
+          value: name
+        },
+      ]
+    },
     {
       title: "Player",
       inputs: [
@@ -67,13 +90,28 @@
   ]
 </script>
 
-<span>40</span>
+<div>
 <SettingsSchema settings={settings}/>
+<span>{life}</span>
+</div>
 
 <style lang="scss">
+  div {
+    position: relative;
+  }
+
   span {
+    display: inline-block;
+
+    position: sticky;
+
+    bottom: 0;
+    left: 0;
+
     background-color: var(--color);
     color: var(--text-color);
+
+    transform: rotate(calc(var(--rotation) * 1deg));
 
     padding: 6px 10px;
 

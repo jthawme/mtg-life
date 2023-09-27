@@ -1,9 +1,10 @@
 import * as tome from 'chromotome';
+import { nameByRace } from "fantasy-name-generator";
 import {writable, get, derived} from 'svelte/store';
 import ShortUniqueId from 'short-unique-id';
 import {store as history} from './history.js';
 import {store as app} from './app.js';
-import { getNth } from '../utils.js';
+import { getNth, randomFrom } from '../utils.js';
 
 const uid = new ShortUniqueId();
 
@@ -19,7 +20,9 @@ const defaultStoreData = {
 const createFakePlayer = ({lifeTotal = defaultStoreData.lifeTotal, index = 0} = {}) => {
   return {
     id: uid.rnd(),
-    name: null,
+    name: nameByRace(randomFrom(["human", "angel", "dwarf", "elf", "halfling"]), {
+      gender: randomFrom(['female', 'male'])
+    }),
     life: lifeTotal,
     settings: {
       flipped: 0,

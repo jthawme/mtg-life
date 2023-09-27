@@ -12,9 +12,11 @@
   export let settings;
   export let life = 0;
   export let values = {};
+  export let name = '';
 
   export let withPoison = false;
   export let withCommanderDamage = false;
+  export let withName = false;
 
   export let debounceTime = 1000;
 
@@ -107,10 +109,10 @@
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div bind:this={el} on:mousemove={onMouseMove} class="tile" class:counterbalance style={style}>
+<div bind:this={el} on:mousemove={onMouseMove} class="tile" class:counterbalance class:rounded={withName || hasAdditionalTrackers} style={style}>
   {#if settingsModal}
     <Modal on:close={() => settingsModal = false}>
-      <PlayerSettings {...settings} id={id} on:update={onUpdate}/>
+      <PlayerSettings {...settings} life={life} name={name} id={id} on:update={onUpdate}/>
     </Modal>
   {/if}
 
@@ -125,6 +127,12 @@
   {/if}
 
   <div class="rotation-plane">
+    {#if withName}
+      <div class="name">
+        {name}
+      </div>
+    {/if}
+
     <div class="tile-hit-area">
       <button tabindex="-1" on:click={() => changeLife(1)} class="tile-hit-area-el tile-hit-area-el--top"/>
       <button tabindex="-1" on:click={() => changeLife(-1)} class="tile-hit-area-el tile-hit-area-el--bottom"/>
@@ -216,6 +224,12 @@
 
     flex-grow: 1;
     color: var(--text-color, inherit);
+
+    // .rounded & {
+      margin: 10px;
+      border-radius: 10px;
+      overflow: hidden;
+    // }
 
     &-display {
       position: absolute;
@@ -328,8 +342,23 @@
     }
   }
 
+  .name {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    margin: 10px 10px 0;
+
+    font-size: calc(var(--global-font-size, 10) * 0.2vw);
+    text-align: center;
+    font-weight: bold;
+    color: var(--text-color, inherit);
+  }
+
   .tracker-tray {
-    margin: 10px;
+    margin: 0 10px 10px;
 
     padding: 10px;
 

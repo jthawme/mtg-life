@@ -42,7 +42,7 @@ function onSettings() {
 
 <div class="tile-wrapper" class:row={$game.players.length <= 2}>
   {#each $game.players as player (player.id) }
-      <PlayerTile {...player} withCommanderDamage={$game.tracking.commander} withPoison={$game.tracking.poison} on:update={onPlayerUpdate}/>
+      <PlayerTile {...player} withName={$app.displayNames} withCommanderDamage={$game.tracking.commander} withPoison={$game.tracking.poison} on:update={onPlayerUpdate}/>
   {/each}
 
   <button class="settings-btn" on:click={onSettings} class:hasImage={!!$app.image}>

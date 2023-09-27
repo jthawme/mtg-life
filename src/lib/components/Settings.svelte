@@ -91,6 +91,12 @@ function onPaletteChange(e) {
   app.setColorPalette(e.target.value);
 }
 
+function hardReset() {
+  localStorage.removeItem("settings");
+  localStorage.removeItem("backup");
+  window.location.reload();
+}
+
 $: settings = [
   {
     title: "Settings",
@@ -129,6 +135,13 @@ $: settings = [
       type: "button",
       click: onReset,
       text: "Reset"
+    },
+    {
+      title: "Display Names",
+      name: "names",
+      type: "checkbox",
+      value: $app.displayNames,
+      change: () => app.toggleDisplayNames()
     },
     {
       title: "Track Poison",
@@ -213,6 +226,19 @@ $: settings = [
           max: 20,
         }
       },
+  ]
+},
+
+{
+  title: "Reset",
+  inputs: [
+    {
+      title: "Fresh everything",
+      name: "fresh",
+      type: "button",
+      click: hardReset,
+      text: "Reset"
+    },
   ]
 }
 ]

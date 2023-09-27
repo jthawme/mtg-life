@@ -37,3 +37,69 @@
   </div>
   {/each}
 </div>
+
+<style lang="scss">
+
+
+
+.group {
+  margin: 1em 0;
+}
+
+.group-title {
+  display: block;
+
+  font-weight: bold;
+
+  border-bottom: 1px solid currentColor;
+
+  padding-bottom: 0.4em;
+  margin-bottom: 1em;
+}
+
+.label {
+  display: grid;
+  margin: 1em 0;
+
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  justify-content: space-between;
+  grid-template-areas: "title input";
+
+  font-size: 1.5rem;
+
+  &-title,
+  &-input {
+    display: block;
+
+    min-width: 0;
+  }
+
+  &-title {
+    grid-area: title;
+  }
+
+  &-input {
+    position: relative;
+
+    grid-area: input;
+
+    justify-self: flex-end;
+    text-align: right;
+  }
+
+  input[type='text'],
+  input[type='email'],
+  input[type='search'] {
+    width: 100%;
+  }
+
+  input[type='file'] {
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+  }
+}
+</style>

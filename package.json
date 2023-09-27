@@ -28,6 +28,7 @@
     "@vite-pwa/sveltekit": "^0.2.7",
     "chromotome": "^1.21.4",
     "date-fns": "^2.30.0",
+    "fantasy-name-generator": "^2.0.0",
     "normalize.css": "^8.0.1",
     "sharp": "^0.32.6",
     "short-unique-id": "^5.0.3",
