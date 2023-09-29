@@ -61,6 +61,7 @@
 
 		:global(.value) {
 			text-align: center;
+			font-weight: bold;
 		}
 
 		.tracker-label {
@@ -95,7 +96,7 @@
 			}
 
 			:global(.value) {
-				font-size: calc(var(--global-font-size, 10) * 0.25vw);
+				font-size: calc(var(--global-font-size, 10) * 0.5vw);
 			}
 		}
 	}

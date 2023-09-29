@@ -1,8 +1,9 @@
 <script>
 	export let settings = [];
+	export let large = false;
 </script>
 
-<div>
+<div class:large>
 	{#each settings as group}
 		<div class="group">
 			<span class="group-title">{group.title}</span>
@@ -78,7 +79,11 @@
 		justify-content: space-between;
 		grid-template-areas: 'title input';
 
-		font-size: 1.5rem;
+		font-size: 1rem;
+
+		.large & {
+			font-size: 1.5rem;
+		}
 
 		&-title,
 		&-input {
@@ -89,6 +94,9 @@
 
 		&-title {
 			grid-area: title;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 
 		&-input {

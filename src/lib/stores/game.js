@@ -24,6 +24,7 @@ const createFakePlayer = ({ lifeTotal = defaultStoreData.lifeTotal, index = 0 } 
 			gender: randomFrom(['female', 'male'])
 		}),
 		life: lifeTotal,
+		commanders: ['Name'],
 		settings: {
 			flipped: 0,
 			color: getNth(tome.get(get(app).colorPalette || 'hilda02').colors, index),

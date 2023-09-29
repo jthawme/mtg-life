@@ -1,59 +1,77 @@
-import { writable } from "svelte/store"
+import { writable } from 'svelte/store';
 
 const storeData = writable({
-  settings: false,
+	settings: false,
 
-  image: null,
+	image: null,
 
-  fontSize: 10,
-  displayNames: false,
+	fontSize: 10,
+	displayNames: false,
 
-  colorPalette: 'miradors',
-  palettes: ['miradors', 'hilda02', 'olympia', 'tsu_arcade', 'jung_bird', 'harvest', 'frozen-rose', 'kov_01', 'cc232', 'rohlfs_4', 'sprague']
+	colorPalette: 'miradors',
+	palettes: [
+		'miradors',
+		'foxshelter',
+		'rag-mysore',
+		'roygbiv-warm',
+		'hilda02',
+		'olympia',
+		'iiso_daily',
+		'jung_bird',
+		'harvest',
+		'frozen-rose',
+		'kov_01',
+		'cc232',
+		'rohlfs_4',
+		'sprague',
+		'revolucion',
+		'system.#04',
+		'cc245'
+	]
 });
 
 export const store = {
-  ...storeData,
-  
-  restore({palettes, settings, ...rest}) {
-    storeData.update(state => ({
-      ...state,
-      ...rest
-    }))
-  },
+	...storeData,
 
-  toggleSettings: (val) => {
-    storeData.update(state => ({
-      ...state,
-      settings: typeof val === 'undefined' ? !state.settings : val
-    }));
-  },
+	restore({ palettes, settings, ...rest }) {
+		storeData.update((state) => ({
+			...state,
+			...rest
+		}));
+	},
 
-  toggleDisplayNames: (val) => {
-    storeData.update(state => ({
-      ...state,
-      displayNames: typeof val === 'undefined' ? !state.displayNames : val
-    }));
-  },
+	toggleSettings: (val) => {
+		storeData.update((state) => ({
+			...state,
+			settings: typeof val === 'undefined' ? !state.settings : val
+		}));
+	},
 
-  setImage(image) {
-    storeData.update(state => ({
-      ...state,
-      image
-    }));
-  },
+	toggleDisplayNames: (val) => {
+		storeData.update((state) => ({
+			...state,
+			displayNames: typeof val === 'undefined' ? !state.displayNames : val
+		}));
+	},
 
-  setColorPalette(colorPalette) {
-    storeData.update(state => ({
-      ...state,
-      colorPalette
-    }));
-  },
+	setImage(image) {
+		storeData.update((state) => ({
+			...state,
+			image
+		}));
+	},
 
-  setFontSize(fontSize) {
-    storeData.update(state => ({
-      ...state,
-      fontSize
-    }));
-  }
-}
+	setColorPalette(colorPalette) {
+		storeData.update((state) => ({
+			...state,
+			colorPalette
+		}));
+	},
+
+	setFontSize(fontSize) {
+		storeData.update((state) => ({
+			...state,
+			fontSize
+		}));
+	}
+};

@@ -1,5 +1,6 @@
 <script>
 	import Settings from '$lib/icons/settings.svg?component';
+	import AddIcon from '$lib/icons/add.svg?component';
 	import { onMount, createEventDispatcher } from 'svelte';
 	import { listenCb, onWindowResize, clickOutside } from '$lib/utils.js';
 	import Modal from './Modal.svelte';
@@ -15,6 +16,7 @@
 	export let life = 0;
 	export let values = {};
 	export let name = '';
+	export let commanders;
 
 	export let withPoison = false;
 	export let withCommanderDamage = false;
@@ -95,13 +97,23 @@
 	function toggleTrackerTray(e) {
 		if (e.target.tagName !== 'BUTTON') {
 			expanded = !expanded;
+		}
+	}
 
-			if (expanded) {
-				clickOutside(trackerEl, () => {
+	let unlisten;
+
+	$: if (!expanded && unlisten) {
+		unlisten();
+	}
+
+	$: if (expanded) {
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				unlisten = clickOutside(trackerEl, () => {
 					expanded = false;
 				});
-			}
-		}
+			});
+		});
 	}
 
 	onMount(() => {
@@ -136,7 +148,7 @@
 >
 	{#if settingsModal}
 		<Modal on:close={() => (settingsModal = false)}>
-			<PlayerSettings {...settings} {life} {name} {id} on:update={onUpdate} />
+			<PlayerSettings {...settings} {commanders} {life} {name} {id} on:update={onUpdate} />
 		</Modal>
 	{/if}
 
@@ -179,6 +191,10 @@
 
 		{#if hasAdditionalTrackers}
 			<div class="tracker-tray" bind:this={trackerEl} on:dblclick={toggleTrackerTray}>
+				{#if !expanded}
+					<button class="expand-btn" on:click={() => (expanded = true)}><AddIcon /></button>
+				{/if}
+
 				{#if withPoison}
 					<GenericTracker
 						{expanded}
@@ -192,6 +208,7 @@
 					<CommanderDamageTracker
 						{id}
 						{expanded}
+						{commanders}
 						class="tracker--commander"
 						label="Commander"
 						value={commander}
@@ -412,9 +429,11 @@
 	}
 
 	.tracker-tray {
+		position: relative;
+
 		margin: 0 10px 10px;
 
-		padding: 10px;
+		padding: 10px 48px;
 
 		background-color: rgba(0, 0, 0, 0.15);
 
@@ -448,13 +467,44 @@
 			display: flex;
 
 			flex-wrap: wrap;
-			background-color: rgba(0, 0, 0, 0.8);
+			background-color: rgba(0, 0, 0, 0.5);
 
 			align-items: stretch;
 
 			:global(> *) {
 				flex-basis: 45%;
+				flex-grow: 1;
 			}
+		}
+	}
+
+	.expand-btn {
+		position: absolute;
+
+		background-color: transparent;
+		padding: 0;
+		margin: 0;
+
+		border: none;
+
+		width: 24px;
+
+		opacity: 0.25;
+
+		&:hover,
+		&:focus-visible {
+			opacity: 0.5;
+			cursor: pointer;
+		}
+
+		.tile:nth-child(2n + 1) & {
+			top: 5px;
+			left: 5px;
+		}
+
+		.tile:nth-child(2n) & {
+			top: 5px;
+			right: 5px;
 		}
 	}
 

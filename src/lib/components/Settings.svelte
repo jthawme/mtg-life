@@ -253,4 +253,4 @@
 	];
 </script>
 
-<SettingsSchema {settings} />
+<SettingsSchema {settings} large />

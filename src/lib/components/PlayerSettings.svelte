@@ -3,120 +3,141 @@
 	import SettingsSchema from './SettingsSchema.svelte';
 	const dispatch = createEventDispatcher();
 
-  export let flipped
-  export let color;
-  export let textColor;
-  export let id;
-  export let name;
-  export let life = 40;
+	export let flipped;
+	export let color;
+	export let textColor;
+	export let id;
+	export let name;
+	export let commanders;
+	export let life = 40;
 
-  function onRotate() {
-    dispatch('update', {
-      id,
-      action: 'change',
-      key: 'settings.flipped',
-      value: ((flipped ?? 0) + 1) % 4
-    })
-  }
+	function onRotate() {
+		dispatch('update', {
+			id,
+			action: 'change',
+			key: 'settings.flipped',
+			value: ((flipped ?? 0) + 1) % 4
+		});
+	}
 
+	function onChangeColor(e) {
+		dispatch('update', {
+			id,
+			action: 'change',
+			key: 'settings.color',
+			value: e.target.value
+		});
+	}
 
-  function onChangeColor(e) {
-    dispatch('update', {
-      id,
-      action: 'change',
-      key: 'settings.color',
-      value: e.target.value
-    })
-  }
+	function onChangeTextColor(e) {
+		dispatch('update', {
+			id,
+			action: 'change',
+			key: 'settings.textColor',
+			value: e.target.value
+		});
+	}
 
+	function onNameUpdate(e) {
+		dispatch('update', {
+			id,
+			action: 'change',
+			key: 'name',
+			value: e.target.value
+		});
+	}
 
-  function onChangeTextColor(e) {
-    dispatch('update', {
-      id,
-      action: 'change',
-      key: 'settings.textColor',
-      value: e.target.value
-    })
-  }
+	function onCommandersUpdate(e) {
+		const value = e.target.value
+			.split(',')
+			.map((t) => t.trim())
+			.filter((t) => !!t);
 
-  function onNameUpdate(e) {
-    dispatch('update', {
-      id,
-      action: 'change',
-      key: 'name',
-      value: e.target.value
-    })
-  }
+		dispatch('update', {
+			id,
+			action: 'change',
+			key: 'commanders',
+			value: value.length > 1 ? value : ['Name']
+		});
+	}
 
-  $: settings = [
-    {
-      title: "Player",
-      inputs: [
-        {
-          title: "Name",
-          name: "name",
-          type: "text",
-          input: onNameUpdate,
-          value: name
-        },
-      ]
-    },
-    {
-      title: "Player",
-      inputs: [
-        {
-          title: "Flipped",
-          name: "flip",
-          type: "button",
-          click: onRotate,
-          text: "Flip"
-        },
-        {
-          title: "Color",
-          name: "flip",
-          type: "color",
-          input: onChangeColor,
-          value: color
-        },
-        {
-          title: "Text Color",
-          name: "textColor",
-          type: "color",
-          input: onChangeTextColor,
-          value: textColor ?? '#ffffff'
-        },
-      ]
-    },
-  ]
+	$: settings = [
+		{
+			title: 'Player',
+			inputs: [
+				{
+					title: 'Name',
+					name: 'name',
+					type: 'text',
+					input: onNameUpdate,
+					value: name
+				},
+				{
+					title: 'Commanders',
+					name: 'commanders',
+					type: 'text',
+					input: onCommandersUpdate,
+					value: commanders.join(','),
+					hint: 'Seperate with commas'
+				}
+			]
+		},
+		{
+			title: 'Player',
+			inputs: [
+				{
+					title: 'Flipped',
+					name: 'flip',
+					type: 'button',
+					click: onRotate,
+					text: 'Flip'
+				},
+				{
+					title: 'Color',
+					name: 'flip',
+					type: 'color',
+					input: onChangeColor,
+					value: color
+				},
+				{
+					title: 'Text Color',
+					name: 'textColor',
+					type: 'color',
+					input: onChangeTextColor,
+					value: textColor ?? '#ffffff'
+				}
+			]
+		}
+	];
 </script>
 
 <div>
-<SettingsSchema settings={settings}/>
-<span>{life}</span>
+	<SettingsSchema {settings} />
+	<span>{life}</span>
 </div>
 
 <style lang="scss">
-  div {
-    position: relative;
-  }
+	div {
+		position: relative;
+	}
 
-  span {
-    display: inline-block;
+	span {
+		display: inline-block;
 
-    position: sticky;
+		position: sticky;
 
-    bottom: 0;
-    left: 0;
+		bottom: 0;
+		left: 0;
 
-    background-color: var(--color);
-    color: var(--text-color);
+		background-color: var(--color);
+		color: var(--text-color);
 
-    transform: rotate(calc(var(--rotation) * 1deg));
+		transform: rotate(calc(var(--rotation) * 1deg));
 
-    padding: 6px 10px;
+		padding: 6px 10px;
 
-    font-weight: bold;
+		font-weight: bold;
 
-    border-radius: 10px;
-  }
+		border-radius: 10px;
+	}
 </style>
