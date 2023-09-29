@@ -1,105 +1,121 @@
 <script>
-  export let settings = [];
+	export let settings = [];
 </script>
 
 <div>
-  {#each settings as group}
-  <div class="group">
-    <span class="group-title">{group.title}</span>
+	{#each settings as group}
+		<div class="group">
+			<span class="group-title">{group.title}</span>
 
-    {#each group.inputs as input}
-    <label class="label">
-      <span class="label-title">{input.title}</span>
-      <span class="label-input">
-        {#if input.type === 'checkbox'}
-        <input type="checkbox" bind:checked={input.value} on:change={input.change} value="1"/>
-        {:else if input.type === 'button'}
-        <button type="button" on:click={input.click} {...(input.options || {})}>{input.text}</button>
-        {:else if input.type === 'image'}
-          <input type="file" accept="image/*" on:change={input.change}/>
-          <span>Select</span>
+			{#each group.inputs as input}
+				<label class={`label ${input.type}`}>
+					<span class="label-title">{input.title}</span>
+					<span class="label-input">
+						{#if input.type === 'checkbox'}
+							<input
+								type="checkbox"
+								bind:checked={input.value}
+								on:change={input.change}
+								value="1"
+							/>
+						{:else if input.type === 'button'}
+							<button type="button" on:click={input.click} {...input.options || {}}
+								>{input.text}</button
+							>
+						{:else if input.type === 'image'}
+							<input type="file" accept="image/*" on:change={input.change} />
+							<span>Select</span>
 
-          {#if input.value}
-            <img src={input.value} alt=""/>
-          {/if}
-        {:else if input.type === 'select'}
-          <select on:change={input.change} value={input.value}>
-            {#each input.options as option}
-              <option value={option.value}>{option.label}</option>
-            {/each}
-          </select>
-        {:else}
-        <input type={input.type} name={input.name} on:input={input.input} value={input.value} {...input.options}/>
-        {/if}
-      </span>
-    </label>
-    {/each}
-  </div>
-  {/each}
+							{#if input.value}
+								<img src={input.value} alt="" />
+							{/if}
+						{:else if input.type === 'select'}
+							<select on:change={input.change} value={input.value}>
+								{#each input.options as option}
+									<option value={option.value}>{option.label}</option>
+								{/each}
+							</select>
+						{:else if input.type === 'comment'}
+							<span>{input.text}</span>
+						{:else}
+							<input
+								type={input.type}
+								name={input.name}
+								on:input={input.input}
+								value={input.value}
+								{...input.options}
+							/>
+						{/if}
+					</span>
+				</label>
+			{/each}
+		</div>
+	{/each}
 </div>
 
 <style lang="scss">
+	.group {
+		margin: 1em 0;
+	}
 
+	.group-title {
+		display: block;
 
+		font-weight: bold;
 
-.group {
-  margin: 1em 0;
-}
+		border-bottom: 1px solid currentColor;
 
-.group-title {
-  display: block;
+		padding-bottom: 0.4em;
+		margin-bottom: 1em;
+	}
 
-  font-weight: bold;
+	.label {
+		display: grid;
+		margin: 1em 0;
 
-  border-bottom: 1px solid currentColor;
+		grid-template-columns: 1fr 1fr;
+		gap: 10px;
+		justify-content: space-between;
+		grid-template-areas: 'title input';
 
-  padding-bottom: 0.4em;
-  margin-bottom: 1em;
-}
+		font-size: 1.5rem;
 
-.label {
-  display: grid;
-  margin: 1em 0;
+		&-title,
+		&-input {
+			display: block;
 
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  justify-content: space-between;
-  grid-template-areas: "title input";
+			min-width: 0;
+		}
 
-  font-size: 1.5rem;
+		&-title {
+			grid-area: title;
+		}
 
-  &-title,
-  &-input {
-    display: block;
+		&-input {
+			position: relative;
 
-    min-width: 0;
-  }
+			grid-area: input;
 
-  &-title {
-    grid-area: title;
-  }
+			justify-self: flex-end;
+			text-align: right;
+		}
 
-  &-input {
-    position: relative;
+		&.comment {
+			font-size: 1rem;
+		}
 
-    grid-area: input;
+		input[type='text'],
+		input[type='email'],
+		input[type='search'] {
+			width: 100%;
+		}
 
-    justify-self: flex-end;
-    text-align: right;
-  }
+		input[type='file'] {
+			position: absolute;
 
-  input[type='text'],
-  input[type='email'],
-  input[type='search'] {
-    width: 100%;
-  }
+			opacity: 0;
 
-  input[type='file'] {
-    position: absolute;
-
-    opacity: 0;
-
-    pointer-events: none;
-  }
-}
+			pointer-events: none;
+		}
+	}
 </style>

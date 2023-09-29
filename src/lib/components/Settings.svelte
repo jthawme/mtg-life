@@ -1,247 +1,256 @@
 <script>
-  import {get} from "svelte/store";
-  import {game, app} from "$lib/store.js";
-	import { onMount } from "svelte";
-	import SettingsSchema from "./SettingsSchema.svelte";
+	import { get } from 'svelte/store';
+	import { game, app } from '$lib/store.js';
+	import { onMount } from 'svelte';
+	import SettingsSchema from './SettingsSchema.svelte';
 
-let amount = get(game).playerCount;
-let lifeTotal = get(game).lifeTotal;
-let hasNoSettings = true;
+	let amount = get(game).playerCount;
+	let lifeTotal = get(game).lifeTotal;
+	let hasNoSettings = true;
 
-function onSettingsFileChange(e) {
-  const [file] = e.target.files;
-  
-  app.setImage(URL.createObjectURL(file));
-}
+	function onSettingsFileChange(e) {
+		const [file] = e.target.files;
 
-function onClearImage() {
-  console.log('hey');
-  app.setImage(null);
-}
+		app.setImage(URL.createObjectURL(file));
+	}
 
-function onReset() {
-  game.reset();
-}
+	function onClearImage() {
+		console.log('hey');
+		app.setImage(null);
+	}
 
-function saveSettings() {
-  const appSettings = get(app);
-  const gameSettings = get(game);
+	function onReset() {
+		game.reset();
+	}
 
-  localStorage.setItem('settings', JSON.stringify({
-    app: appSettings,
-    game: gameSettings
-  }));
-}
+	function saveSettings() {
+		const appSettings = get(app);
+		const gameSettings = get(game);
 
-function restoreSettings() {
-  const settings = localStorage.getItem('settings');
+		localStorage.setItem(
+			'settings',
+			JSON.stringify({
+				app: appSettings,
+				game: gameSettings
+			})
+		);
+	}
 
-  if (!settings){
-    return;
-  }
+	function restoreSettings() {
+		const settings = localStorage.getItem('settings');
 
-  try {
-    const {game: gameSettings, app: appSettings} = JSON.parse(settings)
-    app.restore(appSettings);
+		if (!settings) {
+			return;
+		}
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        game.restore(gameSettings);
-      })
-    })
-  } catch (e) {
-    localStorage.removeItem("settings");
-  }
-}
+		try {
+			const { game: gameSettings, app: appSettings } = JSON.parse(settings);
+			app.restore(appSettings);
 
-function onFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else if (document.exitFullscreen) {
-    document.exitFullscreen();
-  }
-}
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					game.restore(gameSettings);
+				});
+			});
+		} catch (e) {
+			localStorage.removeItem('settings');
+		}
+	}
 
-function toggleTracking(type) {
-  game.toggleTracking(type);
-}
+	function onFullscreen() {
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen();
+		} else if (document.exitFullscreen) {
+			document.exitFullscreen();
+		}
+	}
 
-onMount(() => {
-  const previousSettings = localStorage.getItem('settings');
-  hasNoSettings = !previousSettings;
-});
+	function toggleTracking(type) {
+		game.toggleTracking(type);
+	}
 
-function onInput(e) {
-  const name = e.target.name;
+	onMount(() => {
+		const previousSettings = localStorage.getItem('settings');
+		hasNoSettings = !previousSettings;
+	});
 
-  switch (name) {
-    case "players":
-      game.setPlayers(parseInt(e.target.value));
-      break;
-    case "lifeTotal":
-      game.setKey("lifeTotal", parseInt(e.target.value));
-      break;
-    case "fontSize":
-      app.setFontSize(parseInt(e.target.value));
-      break;
-  }
-}
+	function onInput(e) {
+		const name = e.target.name;
 
-function onPaletteChange(e) {
-  app.setColorPalette(e.target.value);
-}
+		switch (name) {
+			case 'players':
+				game.setPlayers(parseInt(e.target.value));
+				break;
+			case 'lifeTotal':
+				game.setKey('lifeTotal', parseInt(e.target.value));
+				break;
+			case 'fontSize':
+				app.setFontSize(parseInt(e.target.value));
+				break;
+		}
+	}
 
-function hardReset() {
-  localStorage.removeItem("settings");
-  localStorage.removeItem("backup");
-  window.location.reload();
-}
+	function onPaletteChange(e) {
+		app.setColorPalette(e.target.value);
+	}
 
-$: settings = [
-  {
-    title: "Settings",
-    inputs: [
-      {
-        title: "Players",
-        name: "players",
-        type: "number",
-        value: amount,
-        input: onInput,
-        options: {
-          min: 2,
-          max: 4,
-        }
-      },
-      {
-        title: "Life Total",
-        name: "lifeTotal",
-        type: "number",
-        value: lifeTotal,
-        input: onInput,
-        options: {
-          min: 1,
-          max: 100,
-        }
-      }
-    ]
-  },
+	function hardReset() {
+		localStorage.removeItem('settings');
+		localStorage.removeItem('backup');
+		window.location.reload();
+	}
 
-{
-  title: "Gameplay",
-  inputs: [
-    {
-      title: "Reset Totals",
-      name: "totals",
-      type: "button",
-      click: onReset,
-      text: "Reset"
-    },
-    {
-      title: "Display Names",
-      name: "names",
-      type: "checkbox",
-      value: $app.displayNames,
-      change: () => app.toggleDisplayNames()
-    },
-    {
-      title: "Track Poison",
-      name: "poison",
-      type: "checkbox",
-      value: $game.tracking.poison,
-      change: () => toggleTracking('poison')
-    },
-    {
-      title: "Track Commander Damage",
-      name: "commander",
-      type: "checkbox",
-      value: $game.tracking.commander,
-      change: () => toggleTracking('commander')
-    }
-  ]
-},
+	$: settings = [
+		{
+			title: 'Settings',
+			inputs: [
+				{
+					title: 'Players',
+					name: 'players',
+					type: 'number',
+					value: amount,
+					input: onInput,
+					options: {
+						min: 2,
+						max: 4
+					}
+				},
+				{
+					title: 'Life Total',
+					name: 'lifeTotal',
+					type: 'number',
+					value: lifeTotal,
+					input: onInput,
+					options: {
+						min: 1,
+						max: 100
+					}
+				}
+			]
+		},
 
-{
-  title: "App",
-  inputs: [
-    {
-      title: "Save settings",
-      name: "save",
-      type: "button",
-      click: saveSettings,
-      text: "Save"
-    },
-    {
-      title: "Restore settings",
-      name: "restore",
-      type: "button",
-      click: restoreSettings,
-      text: "Restore",
-      options: {
-        disabled: hasNoSettings
-      }
-    },
-    {
-      title: "Fullscreen",
-      name: "fullscreen",
-      type: "button",
-      click: onFullscreen,
-      text: "Toggle"
-    },
-    {
-      title: "Settings image",
-      name: "image",
-      type: "image",
-      change: onSettingsFileChange,
-      value: $app.image
-    },
-    {
-      title: "Clear image",
-      name: "clearImage",
-      type: "button",
-      click: onClearImage,
-      text: "Clear",
-      options: {
-        disabled: !$app.image
-      }
-    },
-    {
-      title: "Colour Palette",
-      name: "palette",
-      type: "select",
-      change: onPaletteChange,
-      value: $app.colorPalette,
-      options: [...$app.palettes].map((option) => ({
-        value: option,
-        label: option
-      }))
-    },
-      {
-        title: "Font Size",
-        name: "fontSize",
-        type: "number",
-        value: $app.fontSize,
-        input: onInput,
-        options: {
-          min: 1,
-          max: 20,
-        }
-      },
-  ]
-},
+		{
+			title: 'Gameplay',
+			inputs: [
+				{
+					title: 'Reset Totals',
+					name: 'totals',
+					type: 'button',
+					click: onReset,
+					text: 'Reset'
+				},
+				{
+					title: 'Display Names',
+					name: 'names',
+					type: 'checkbox',
+					value: $app.displayNames,
+					change: () => app.toggleDisplayNames()
+				},
+				{
+					title: 'Track Poison',
+					name: 'poison',
+					type: 'checkbox',
+					value: $game.tracking.poison,
+					change: () => toggleTracking('poison')
+				},
+				{
+					title: 'Track Commander Damage',
+					name: 'commander',
+					type: 'checkbox',
+					value: $game.tracking.commander,
+					change: () => toggleTracking('commander')
+				},
+				{
+					title: ' ',
+					name: 'tracker',
+					type: 'comment',
+					text: 'Double tap the section with the values in, to make them larger'
+				}
+			]
+		},
 
-{
-  title: "Reset",
-  inputs: [
-    {
-      title: "Fresh everything",
-      name: "fresh",
-      type: "button",
-      click: hardReset,
-      text: "Reset"
-    },
-  ]
-}
-]
+		{
+			title: 'App',
+			inputs: [
+				{
+					title: 'Save settings',
+					name: 'save',
+					type: 'button',
+					click: saveSettings,
+					text: 'Save'
+				},
+				{
+					title: 'Restore settings',
+					name: 'restore',
+					type: 'button',
+					click: restoreSettings,
+					text: 'Restore',
+					options: {
+						disabled: hasNoSettings
+					}
+				},
+				{
+					title: 'Fullscreen',
+					name: 'fullscreen',
+					type: 'button',
+					click: onFullscreen,
+					text: 'Toggle'
+				},
+				{
+					title: 'Settings image',
+					name: 'image',
+					type: 'image',
+					change: onSettingsFileChange,
+					value: $app.image
+				},
+				{
+					title: 'Clear image',
+					name: 'clearImage',
+					type: 'button',
+					click: onClearImage,
+					text: 'Clear',
+					options: {
+						disabled: !$app.image
+					}
+				},
+				{
+					title: 'Colour Palette',
+					name: 'palette',
+					type: 'select',
+					change: onPaletteChange,
+					value: $app.colorPalette,
+					options: [...$app.palettes].map((option) => ({
+						value: option,
+						label: option
+					}))
+				},
+				{
+					title: 'Font Size',
+					name: 'fontSize',
+					type: 'number',
+					value: $app.fontSize,
+					input: onInput,
+					options: {
+						min: 1,
+						max: 20
+					}
+				}
+			]
+		},
+
+		{
+			title: 'Reset',
+			inputs: [
+				{
+					title: 'Fresh everything',
+					name: 'fresh',
+					type: 'button',
+					click: hardReset,
+					text: 'Reset'
+				}
+			]
+		}
+	];
 </script>
 
-<SettingsSchema settings={settings}/>
+<SettingsSchema {settings} />
