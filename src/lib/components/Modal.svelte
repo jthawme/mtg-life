@@ -46,7 +46,8 @@
 		background-color: rgba(0, 0, 0, 0.5);
 		backdrop-filter: blur(10px);
 
-		z-index: 20;
+		z-index: 50;
+		-webkit-transform: translate3d(0, 0, 0);
 	}
 
 	.inner {

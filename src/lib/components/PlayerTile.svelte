@@ -293,6 +293,9 @@
 		flex-grow: 1;
 		color: var(--text-color, inherit);
 
+		z-index: 1;
+		touch-action: manipulation;
+
 		// .rounded & {
 		margin: 10px;
 		border-radius: 10px;
@@ -438,6 +441,7 @@
 		background-color: rgba(0, 0, 0, 0.15);
 
 		border-radius: 10px;
+		z-index: 2;
 
 		display: grid;
 		grid-auto-flow: column;
